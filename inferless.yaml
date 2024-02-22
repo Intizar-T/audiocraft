@@ -3,6 +3,7 @@ build:
     - "libssl-dev"
     - "ffmpeg"
   python_packages:
+    - "cog"
     - "torch"
     - "torchaudio"
     - "audiocraft"
