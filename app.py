@@ -12,19 +12,19 @@ class InferlessPythonModel:
     # Function to perform inference
     def infer(self, inputs):
         output_name = "output"
-        output_name_with_format = "output.{}".format(inputs["audio_format"])
-        model = MusicGen.get_pretrained(inputs["model_type"])
+        output_name_with_format = "output.{}".format(inputs.get("audio_format", "wav"))
+        model = MusicGen.get_pretrained(inputs.get("model_type", "medium"))
         model.set_generation_params(
-            duration=inputs["duration"],
-            use_sampling=inputs["use_sampling"],
-            top_k=inputs["top_k"],
-            top_p=inputs["top_p"],
-            temperature=inputs["temperature"],
-            cfg_coef=inputs["cfg_coef"],
-            two_step_cfg=inputs["two_step_cfg"],
+            duration=inputs.get("duration", 5),
+            use_sampling=inputs.get("use_sampling", True),
+            top_k=inputs.get("top_k", 250),
+            top_p=inputs.get("top_p", 0.0),
+            temperature=inputs.get("temperature", 1.0),
+            cfg_coef=inputs.get("cfg_coef", 3.0),
+            two_step_cfg=inputs.get("two_step_cfg", False),
         )
 
-        descriptions = [inputs["prompt"]]
+        descriptions = [inputs.get("prompt", "A dynamic blend of hip-hop and orchestral elements, with sweeping strings and brass, evoking the vibrant energy of the city.")]
 
         output_data = model.generate(descriptions)
         wav = output_data[0]
@@ -32,14 +32,14 @@ class InferlessPythonModel:
             stem_name=output_name,
             wav=wav.cpu(),
             sample_rate=model.sample_rate,
-            format=inputs["audio_format"],
-            mp3_rate=inputs["audio_mp3_rate"],
-            normalize=inputs["audio_normalize"],
-            strategy=inputs["audio_strategy"],
-            peak_clip_headroom_db=inputs["audio_peak_clip_headroom_db"],
-            rms_headroom_db=inputs["audio_rms_headroom_db"],
-            loudness_headroom_db=inputs["audio_loudness_headroom_db"],
-            log_clipping=inputs["audio_log_clipping"],
+            format=inputs.get("audio_format", "wav"),
+            mp3_rate=inputs.get("audio_mp3_rate", 320),
+            normalize=inputs.get("audio_normalize", True),
+            strategy=inputs.get("audio_strategy", "peak"),
+            peak_clip_headroom_db=inputs.get("audio_peak_clip_headroom_db", 1.0),
+            rms_headroom_db=inputs.get("audio_rms_headroom_db", 18.0),
+            loudness_headroom_db=inputs.get("audio_loudness_headroom_db", 14.0),
+            log_clipping=inputs.get("audio_log_clipping", True),
         )
 
         return {"output_audio": Path(output_name_with_format)}
