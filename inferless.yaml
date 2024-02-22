@@ -1,0 +1,8 @@
+build:
+  system_packages:
+    - "libssl-dev"
+    - "ffmpeg"
+  python_packages:
+    - "torch"
+    - "torchaudio"
+    - "audiocraft"
