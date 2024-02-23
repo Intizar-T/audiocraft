@@ -1,6 +1,8 @@
 from audiocraft.models import MusicGen
 from audiocraft.data.audio import audio_write
-from cog import Path
+import base64
+import io
+import soundfile as sf
 
 
 class InferlessPythonModel:
@@ -12,7 +14,7 @@ class InferlessPythonModel:
     # Function to perform inference
     def infer(self, inputs):
         output_name = "output"
-        output_name_with_format = "output.{}".format(inputs.get("audio_format", "wav"))
+        output_name_with_format = "output.{}".format("wav")
         model = MusicGen.get_pretrained(inputs.get("model_type", "medium"))
         model.set_generation_params(
             duration=inputs.get("duration", 5),
@@ -32,7 +34,7 @@ class InferlessPythonModel:
             stem_name=output_name,
             wav=wav.cpu(),
             sample_rate=model.sample_rate,
-            format=inputs.get("audio_format", "wav"),
+            format="wav",
             mp3_rate=inputs.get("audio_mp3_rate", 320),
             normalize=inputs.get("audio_normalize", True),
             strategy=inputs.get("audio_strategy", "peak"),
@@ -42,7 +44,15 @@ class InferlessPythonModel:
             log_clipping=inputs.get("audio_log_clipping", True),
         )
 
-        return {"output_audio": Path(output_name_with_format)}
+        # Read audio file
+        data, samplerate = sf.read(output_name_with_format)
+
+        # Encode audio data to base64
+        buffered = io.BytesIO()
+        sf.write(buffered, data, samplerate, format='wav')
+        base64_encoded = base64.b64encode(buffered.getvalue()).decode('utf-8')
+
+        return {"output_audio": base64_encoded}
 
     # perform any cleanup activity here
     def finalize(self):
