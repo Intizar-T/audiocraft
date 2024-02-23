@@ -3,7 +3,7 @@ build:
     - "libssl-dev"
     - "ffmpeg"
   python_packages:
-    - "soundfile"
     - "torch"
     - "torchaudio"
+    - "soundfile"
     - "audiocraft"
